@@ -5,12 +5,12 @@ Análisis de telemetría, detección de anomalías y persistencia de alertas en 
 from datetime import datetime, timezone
 import logging
 from typing import Optional
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.models.schemas import AIAnalysisRequest, AIAnalysisResponse, AIAnalysisValues
-from app.models.sql_models import Alert
+from app.models.sql_models import Alert, Measurement
 from app.services.ai_service import telemetry_ai
 
 logger = logging.getLogger(__name__)
@@ -76,3 +76,37 @@ async def analyze_telemetry(
         alert_created=alert_created,
         alert_id=alert_id
     )
+
+
+@router.post(
+    "/retrain",
+    summary="Calibrar modelo IsolationForest con historial de Supabase"
+)
+async def retrain_ai_model(
+    db: Session = Depends(get_db)
+) -> dict:
+    """Consulta las mediciones registradas en Supabase y calibra el modelo IsolationForest si se cuenta con suficientes muestras (mínimo 20)."""
+    try:
+        records = db.query(Measurement).limit(1000).all()
+        samples = [[float(r.heart_rate), float(r.spo2), float(r.temperature)] for r in records]
+        success = telemetry_ai.train_with_history(samples)
+
+        if success:
+            return {
+                "trained": True,
+                "samples_count": len(samples),
+                "message": f"Modelo IsolationForest calibrado exitosamente con {len(samples)} registros de telemetría."
+            }
+        else:
+            return {
+                "trained": False,
+                "samples_count": len(samples),
+                "required_minimum": 20,
+                "message": f"Muestras insuficientes ({len(samples)}/20). El modelo continuará operando con el perfil sintético de referencia."
+            }
+    except Exception as exc:
+        logger.error(f"Error al reentrenar modelo: {exc}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error al procesar la calibración del modelo con la base de datos"
+        )

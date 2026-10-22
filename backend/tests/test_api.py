@@ -480,3 +480,33 @@ def test_ai_analyze_fallback_on_insufficient_training_data():
     data = response.json()
     assert data["model_trained"] is False
     assert "perfil de referencia sintético" in data["explanation"]
+
+
+def test_ai_retrain_endpoint_insufficient_samples():
+    """Valida que /retrain informe cuando hay menos de 20 muestras sin arrojar errores."""
+    response = client.post("/api/v1/ai/retrain")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["trained"] is False
+    assert data["samples_count"] == 0
+    assert data["required_minimum"] == 20
+
+
+def test_ai_retrain_endpoint_success_with_samples():
+    """Valida que /retrain calibre el modelo si se cuenta con al menos 20 registros."""
+    # Insertar 22 mediciones sintéticas en la base de datos de prueba
+    for i in range(22):
+        client.post("/api/v1/measurements", json={
+            "device_id": "ASTRA-TRAIN",
+            "heart_rate": 68.0 + (i % 15),
+            "spo2": 97.0 + ((i % 4) * 0.5),
+            "temperature": 36.4 + ((i % 5) * 0.1),
+            "activity": "resting"
+        })
+
+    response = client.post("/api/v1/ai/retrain")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["trained"] is True
+    assert data["samples_count"] == 22
+    assert "calibrado exitosamente" in data["message"]

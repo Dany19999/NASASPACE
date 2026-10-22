@@ -73,3 +73,4 @@ python -m pytest tests -v
 | `GET` | `/api/v1/measurements/latest` | Obtener la última medición registrada en la base de datos |
 | `GET` | `/api/v1/measurements/history` | Obtener historial temporal de mediciones (`?limit=50`) |
 | `POST` | `/api/v1/ai/analyze` | Análisis de anomalías con IsolationForest y reglas de seguridad |
+| `POST` | `/api/v1/ai/retrain` | Calibrar modelo IsolationForest con historial de telemetría de Supabase |
