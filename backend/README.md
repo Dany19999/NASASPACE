@@ -1,6 +1,6 @@
 # ASTRAHEALTH-AI — Backend API
 
-Backend modular desarrollado con **FastAPI** y validación de datos con **Pydantic** para el monitoreo fisiológico de astronautas en misiones espaciales.
+Backend modular desarrollado con **FastAPI**, validación de datos con **Pydantic** y persistencia relacional con **SQLAlchemy** conectada a **Supabase PostgreSQL** para el monitoreo fisiológico de astronautas en misiones espaciales.
 
 ---
 
@@ -22,12 +22,30 @@ pip install -r requirements.txt
 
 ---
 
-## 🏃 2. Ejecución del Servidor
+## 🔑 2. Configuración de Variables de Entorno
+
+Copiar el archivo de plantilla `.env.example` a `.env` dentro de `backend/`:
+
+```bash
+cp .env.example .env
+```
+
+Configurar la variable de conexión a Supabase:
+
+```env
+DATABASE_URL=postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
+```
+
+> 🔒 **Seguridad:** El archivo `.env` se encuentra ignorado por `.gitignore` y jamás debe ser subido al repositorio.
+
+---
+
+## 🏃 3. Ejecución del Servidor
 
 Desde el directorio `backend/`:
 
 ```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 * **Swagger UI interactivo:** [http://localhost:8000/docs](http://localhost:8000/docs)
@@ -36,15 +54,9 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ---
 
-## 🧪 3. Ejecución de Pruebas Automatizadas
+## 🧪 4. Ejecución de Pruebas Automatizadas
 
 Desde el directorio `backend/`:
-
-```bash
-pytest tests -v
-```
-
-o ejecutando mediante el intérprete de Python:
 
 ```bash
 python -m pytest tests -v
@@ -52,11 +64,12 @@ python -m pytest tests -v
 
 ---
 
-## 📡 4. Endpoints Disponibles
+## 📡 5. Endpoints Disponibles
 
 | Método | Endpoint | Descripción |
 | :--- | :--- | :--- |
-| `GET` | `/health` | Comprobación de estado operativo del servicio |
-| `POST` | `/api/v1/measurements` | Recibir y validar telemetría de signos vitales |
-| `GET` | `/api/v1/measurements/latest` | Obtener la última medición registrada |
+| `GET` | `/health` | Diagnóstico de estado operativo de la API y de la conexión a Supabase |
+| `POST` | `/api/v1/measurements` | Recibir, validar y persistir telemetría de signos vitales en Supabase |
+| `GET` | `/api/v1/measurements/latest` | Obtener la última medición registrada en la base de datos |
 | `GET` | `/api/v1/measurements/history` | Obtener historial temporal de mediciones (`?limit=50`) |
+| `POST` | `/api/v1/ai/analyze` | Análisis de anomalías con IsolationForest y reglas de seguridad |

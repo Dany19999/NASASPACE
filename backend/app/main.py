@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
+from app.api.v1.ai import router as ai_router
 from app.api.v1.measurements import router as measurements_router
 from app.core.config import API_V1_PREFIX, CORS_ORIGINS, PROJECT_NAME, VERSION
 
@@ -31,6 +32,7 @@ app.add_middleware(
 # Inclusión de rutas
 app.include_router(health_router)
 app.include_router(measurements_router, prefix=API_V1_PREFIX)
+app.include_router(ai_router, prefix=API_V1_PREFIX)
 
 
 @app.get("/", tags=["Root"], summary="Punto de bienvenida de la API")
