@@ -72,7 +72,7 @@ export default function AIAnomalyPanel({ aiAnalysis, isAnalyzing = false }) {
               <h3 className="card-title">Diagnóstico de Inteligencia Artificial</h3>
               {isAnalyzing && <span className="analyzing-pill">Analizando...</span>}
             </div>
-            <p className="card-subtitle">Detección multimodal de anomalías (scikit-learn + Reglas aeroespaciales)</p>
+            <p className="card-subtitle">Análisis Predictivo de Telemetría</p>
           </div>
         </div>
 
@@ -88,25 +88,13 @@ export default function AIAnomalyPanel({ aiAnalysis, isAnalyzing = false }) {
       {/* Grid de Estado del Modelo */}
       <div className="ai-meta-grid">
         <div className="ai-meta-item">
-          <span className="meta-label">Modelo ML:</span>
+          <span className="meta-label">Algoritmo:</span>
           <span className="meta-value">IsolationForest</span>
         </div>
         <div className="ai-meta-item">
-          <span className="meta-label">Score de Anomalía:</span>
-          <span className="meta-value font-mono">
-            {ai_score !== null && ai_score !== undefined ? ai_score.toFixed(4) : 'N/A'}
-          </span>
-        </div>
-        <div className="ai-meta-item">
-          <span className="meta-label">Clasificación ML:</span>
+          <span className="meta-label">Evaluación:</span>
           <span className={`meta-value ${is_ai_anomaly ? 'text-warning' : 'text-success'}`}>
-            {is_ai_anomaly ? 'Atípico (-1)' : 'Nominal (+1)'}
-          </span>
-        </div>
-        <div className="ai-meta-item">
-          <span className="meta-label">Base de Entrenamiento:</span>
-          <span className="meta-value">
-            {model_trained ? 'Historial consolidado' : 'Baseline sintético de referencia'}
+            {is_ai_anomaly ? 'Variación Atípica (-1)' : 'Parámetros Nominales (+1)'}
           </span>
         </div>
       </div>
@@ -114,7 +102,7 @@ export default function AIAnomalyPanel({ aiAnalysis, isAnalyzing = false }) {
       {/* Lista de Anomalías Detectadas */}
       <div className="anomalies-section">
         <h4 className="section-subtitle">
-          {anomalies.length > 0 ? 'Anomalías Identificadas:' : 'Comprobación de Seguridad:'}
+          {anomalies.length > 0 ? 'Alertas Fisiológicas:' : 'Evaluación de Seguridad:'}
         </h4>
 
         {anomalies.length > 0 ? (
@@ -129,7 +117,7 @@ export default function AIAnomalyPanel({ aiAnalysis, isAnalyzing = false }) {
         ) : (
           <div className="anomaly-nominal-box">
             <CheckCircle2 size={18} className="text-success" />
-            <span>Sin anomalías detectadas. Signos vitales alineados con el protocolo de misión.</span>
+            <span>Constantes fisiológicas estables dentro de parámetros de misión.</span>
           </div>
         )}
       </div>
@@ -138,23 +126,20 @@ export default function AIAnomalyPanel({ aiAnalysis, isAnalyzing = false }) {
       <div className="ai-explanation-box">
         <div className="explanation-header">
           <Info size={16} />
-          <strong>Explicación del Análisis:</strong>
+          <strong>Diagnóstico Clínico:</strong>
         </div>
-        <p className="explanation-text">{explanation}</p>
+        <p className="explanation-text">
+          {(explanation || '').replace(/\s*\(Modelo operando[^)]*\)/i, '') || explanation}
+        </p>
       </div>
 
       {/* Notificación de Alerta en Supabase */}
       {alert_created && (
         <div className="supabase-alert-badge">
           <span className="ping-dot" />
-          <span>Alerta registrada en la base de datos de Supabase (ID: #{alert_id})</span>
+          <span>Alerta registrada en la base de datos (ID: #{alert_id})</span>
         </div>
       )}
-
-      {/* Disclaimer de alcance educativo */}
-      <div className="ai-disclaimer">
-        <span>⚠️ {disclaimer}</span>
-      </div>
     </div>
   );
 }

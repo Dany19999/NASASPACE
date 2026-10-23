@@ -28,7 +28,7 @@ export default function Header({
             <span className="brand-badge">MISSION CONTROL</span>
           </div>
           <p className="brand-subtitle">
-            Monitoreo Fisiológico y Detección de Anomalías con IA en Misiones Espaciales
+            Monitoreo Biométrico y Soporte Fisiológico Aeroespacial
           </p>
         </div>
       </div>

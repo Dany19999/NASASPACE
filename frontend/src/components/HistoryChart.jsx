@@ -83,8 +83,8 @@ export default function HistoryChart({ history = [] }) {
         <div className="chart-title-group">
           <TrendingUp className="icon-highlight" size={20} />
           <div>
-            <h3 className="card-title">Historial de Telemetría Fisiológica</h3>
-            <p className="card-subtitle">Seguimiento temporal de signos vitales ({history.length} muestras)</p>
+            <h3 className="card-title">Telemetría Fisiológica en Tiempo Real</h3>
+            <p className="card-subtitle">Monitoreo continuo de signos vitales</p>
           </div>
         </div>
 
