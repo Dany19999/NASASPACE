@@ -3,7 +3,16 @@
  * Consume endpoints de FastAPI y módulo de IA.
  */
 
-const BASE_URL = import.meta.env.VITE_API_URL || '';
+// Si se ejecuta en un host remoto (como Render), usar rutas relativas al mismo servidor
+let resolvedBaseUrl = import.meta.env.VITE_API_URL || '';
+if (typeof window !== 'undefined') {
+  const isRemoteHost = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+  if (isRemoteHost && (resolvedBaseUrl.includes('localhost') || resolvedBaseUrl.includes('127.0.0.1') || !resolvedBaseUrl)) {
+    resolvedBaseUrl = '';
+  }
+}
+
+const BASE_URL = resolvedBaseUrl;
 
 /**
  * Normaliza errores HTTP para el cliente.

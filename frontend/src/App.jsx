@@ -55,8 +55,17 @@ export default function App() {
       setError(null);
 
       // 2. Consulta de Historial
-      const historyData = await fetchMeasurementHistory(30);
-      setHistory(Array.isArray(historyData) ? historyData : []);
+      try {
+        const historyData = await fetchMeasurementHistory(30);
+        setHistory(Array.isArray(historyData) ? historyData : []);
+      } catch (histErr) {
+        if (histErr.status === 503) {
+          console.warn('Base de datos aún no configurada en el servidor.');
+          setHistory([]);
+        } else {
+          throw histErr;
+        }
+      }
 
       // 3. Consulta de Última Medición
       try {
@@ -84,8 +93,8 @@ export default function App() {
           }
         }
       } catch (latestErr) {
-        // Código 404 significa que la base de datos no tiene mediciones aún
-        if (latestErr.status === 404) {
+        // 404 significa que no hay mediciones aún; 503 significa que la BD está pendiente de configuración
+        if (latestErr.status === 404 || latestErr.status === 503) {
           setLatestMeasurement(null);
           setAiAnalysis(null);
         } else {
@@ -95,9 +104,9 @@ export default function App() {
 
       setLastUpdated(new Date());
     } catch (err) {
-      console.error('Error sincronizando con el backend:', err);
       setConnectionStatus('offline');
-      setError(`No fue posible conectar con el backend (${BASE_URL}). Verifica que el servidor FastAPI esté en ejecución.`);
+      const serverLabel = BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'servidor');
+      setError(`No fue posible conectar con el backend (${serverLabel}). Verifica la disponibilidad de la API.`);
     } finally {
       setLoading(false);
       setIsRefreshing(false);
@@ -138,7 +147,11 @@ export default function App() {
       showNotification('¡Telemetría simulada enviada y persistida en Supabase con éxito!', 'success');
       await loadData(true);
     } catch (err) {
-      showNotification(`Fallo al enviar medición: ${err.message}`, 'error');
+      if (err.status === 503) {
+        showNotification('Para guardar datos, configura DATABASE_URL en el panel de Render', 'warning');
+      } else {
+        showNotification(`Fallo al enviar medición: ${err.message}`, 'error');
+      }
     } finally {
       setIsSendingSample(false);
     }
