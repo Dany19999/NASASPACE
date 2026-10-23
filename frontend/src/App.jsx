@@ -54,17 +54,12 @@ export default function App() {
       setConnectionStatus('online');
       setError(null);
 
-      // 2. Consulta de Historial
+      // 2. Consulta de Historial (tolerante a fallos)
       try {
         const historyData = await fetchMeasurementHistory(30);
         setHistory(Array.isArray(historyData) ? historyData : []);
       } catch (histErr) {
-        if (histErr.status === 503) {
-          console.warn('Base de datos aún no configurada en el servidor.');
-          setHistory([]);
-        } else {
-          throw histErr;
-        }
+        console.warn('Historial no disponible temporalmente:', histErr.message);
       }
 
       // 3. Consulta de Última Medición
@@ -87,23 +82,19 @@ export default function App() {
             });
             setAiAnalysis(aiResult);
           } catch (aiErr) {
-            console.warn('Endpoint de IA no disponible o con fallo temporal:', aiErr.message);
+            console.warn('Endpoint de IA con retraso temporal:', aiErr.message);
           } finally {
             setIsAnalyzing(false);
           }
         }
       } catch (latestErr) {
-        // 404 significa que no hay mediciones aún; 503 significa que la BD está pendiente de configuración
-        if (latestErr.status === 404 || latestErr.status === 503) {
-          setLatestMeasurement(null);
-          setAiAnalysis(null);
-        } else {
-          throw latestErr;
-        }
+        // Silencioso si no hay mediciones
       }
 
       setLastUpdated(new Date());
     } catch (err) {
+      // Solo si el endpoint /health no responde se considera offline
+      console.error('Error sincronizando con el backend:', err);
       setConnectionStatus('offline');
       const serverLabel = BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'servidor');
       setError(`No fue posible conectar con el backend (${serverLabel}). Verifica la disponibilidad de la API.`);

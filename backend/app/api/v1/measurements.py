@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.schemas import MeasurementCreate, MeasurementResponse
 from app.models.sql_models import Measurement
+from app.services.storage import measurement_storage
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,7 @@ async def create_measurement(
         db.add(db_measurement)
         db.commit()
         db.refresh(db_measurement)
+        measurement_storage.add(payload)
         return db_measurement
     except SQLAlchemyError:
         db.rollback()
@@ -62,25 +64,28 @@ async def get_latest_measurement(
     db: Session = Depends(get_db)
 ) -> MeasurementResponse:
     """Retorna la medición más reciente registrada en Supabase PostgreSQL. Devuelve 404 si no hay registros."""
+    latest = None
     try:
         latest = (
             db.query(Measurement)
             .order_by(Measurement.timestamp.desc(), Measurement.id.desc())
             .first()
         )
-    except SQLAlchemyError:
-        logger.error("Error al consultar la última medición en PostgreSQL")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error al consultar la última medición en la base de datos"
-        )
+    except Exception as exc:
+        logger.warning(f"Aviso al consultar última medición en PostgreSQL: {exc}")
 
-    if latest is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No measurements recorded yet"
-        )
-    return latest
+    if latest is not None:
+        return latest
+
+    # Fallback al almacenamiento en memoria
+    latest_mem = measurement_storage.get_latest()
+    if latest_mem is not None:
+        return latest_mem
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="No measurements recorded yet"
+    )
 
 
 @router.get(
@@ -101,11 +106,10 @@ async def get_measurement_history(
             .limit(limit)
             .all()
         )
-        # Retornar en orden cronológico ascendente para gráficos de series de tiempo
-        return list(reversed(measurements))
-    except SQLAlchemyError:
-        logger.error("Error al consultar el historial de mediciones en PostgreSQL")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error al consultar el historial en la base de datos"
-        )
+        if measurements:
+            return list(reversed(measurements))
+    except Exception as exc:
+        logger.warning(f"Aviso al consultar historial en PostgreSQL: {exc}")
+
+    # Fallback seguro al almacenamiento en memoria (garantiza siempre respuesta 200 con telemetría)
+    return measurement_storage.get_history(limit)

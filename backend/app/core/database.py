@@ -22,10 +22,22 @@ if DATABASE_URL:
     elif db_url.startswith("postgresql://") and not db_url.startswith("postgresql+"):
         db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
 
+    # Traducir automáticamente host directo de Supabase (IPv6) al pooler IPv4 de AWS
+    import re
+    supabase_match = re.search(r"@db\.([a-zA-Z0-9]+)\.supabase\.co(?::\d+)?/(.+)", db_url)
+    if supabase_match:
+        project_ref = supabase_match.group(1)
+        db_name = supabase_match.group(2)
+        prefix = db_url[:supabase_match.start()]
+        if "://postgres:" in prefix:
+            prefix = prefix.replace("://postgres:", f"://postgres.{project_ref}:")
+        db_url = f"{prefix}@aws-0-us-east-1.pooler.supabase.com:5432/{db_name}"
+
     engine = create_engine(
         db_url,
         pool_pre_ping=True,
         pool_recycle=300,
+        connect_args={"connect_timeout": 5},
     )
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

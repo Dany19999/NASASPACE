@@ -24,8 +24,11 @@ else:
         "*",
     ]
 
-# URL de conexión a Supabase PostgreSQL
-DATABASE_URL = os.getenv("DATABASE_URL")
+# URL de conexión a Supabase PostgreSQL (utiliza el pooler IPv4 por defecto)
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql://postgres.puwouhppqlkljzjqjzln:Lenin123Sabino@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
+)
 
 # Puerto configurable para Render o ejecución local
 PORT = int(os.getenv("PORT", "8000"))

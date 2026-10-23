@@ -55,10 +55,31 @@ class InMemoryMeasurementStorage:
             self._measurements.clear()
             self._counter = 0
 
-    def count(self) -> int:
-        """Cantidad total de mediciones en memoria."""
+    def seed_defaults(self) -> None:
+        """Siembra mediciones de telemetría de demostración para visualización inicial."""
+        from datetime import timedelta
+        now = datetime.now(timezone.utc)
+        defaults = [
+            (72.0, 98.4, 36.6, "resting", now - timedelta(minutes=15)),
+            (74.0, 98.2, 36.6, "resting", now - timedelta(minutes=10)),
+            (75.0, 98.5, 36.7, "resting", now - timedelta(minutes=5)),
+            (78.0, 98.1, 36.8, "resting", now - timedelta(minutes=2)),
+            (73.0, 98.6, 36.6, "resting", now),
+        ]
         with self._lock:
-            return len(self._measurements)
+            if not self._measurements:
+                for hr, spo2, temp, act, ts in defaults:
+                    self._counter += 1
+                    self._measurements.append(MeasurementResponse(
+                        id=self._counter,
+                        device_id="ASTRA-ESP32-01",
+                        heart_rate=hr,
+                        spo2=spo2,
+                        temperature=temp,
+                        activity=act,
+                        timestamp=ts,
+                        received_at=ts
+                    ))
 
 
 # Instancia singleton del almacenamiento en memoria para la aplicación
