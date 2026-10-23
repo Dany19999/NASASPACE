@@ -97,3 +97,4 @@ El repositorio incluye el archivo [render.yaml](file:///c:/Users/LENIN/Documents
 * **Rewrite Rule:** `/*` ➔ `/index.html` (SPA routing)
 * **Variables de entorno:**
   * `VITE_API_URL`: URL pública asignada al backend en Render (ej. `https://astrahealth-backend.onrender.com`).
+"# NASASPACE" 
