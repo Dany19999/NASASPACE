@@ -25,7 +25,7 @@ export default function Header({
         <div>
           <div className="brand-title-row">
             <h1 className="brand-title">ASTRAHEALTH-AI</h1>
-            <span className="brand-badge">NASA SPACE APPS 2026</span>
+            <span className="brand-badge">MISSION CONTROL</span>
           </div>
           <p className="brand-subtitle">
             Monitoreo Fisiológico y Detección de Anomalías con IA en Misiones Espaciales
@@ -84,16 +84,16 @@ export default function Header({
             <span>Sincronizar</span>
           </button>
 
-          {/* Botón Enviar Muestra de Demostración */}
+          {/* Botón Transmitir Telemetría */}
           <button
             type="button"
             className="btn btn-primary"
             onClick={onSendSample}
             disabled={isSendingSample || !isOnline}
-            title="Generar y enviar una medición fisiológica de prueba al backend"
+            title="Registrar y transmitir una lectura de telemetría médica al sistema"
           >
             <Send size={16} className={isSendingSample ? 'spin' : ''} />
-            <span>Enviar Telemetría Demo</span>
+            <span>Transmitir Telemetría</span>
           </button>
         </div>
       </div>

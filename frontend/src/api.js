@@ -87,7 +87,7 @@ export async function analyzeTelemetryWithAI(payload) {
  */
 export async function sendSampleMeasurement(sampleData = null) {
   const body = sampleData || {
-    device_id: 'ASTRA-ESP32-DEMO',
+    device_id: 'ASTRA-ESP32-01',
     heart_rate: Number((65 + Math.random() * 20).toFixed(1)),
     spo2: Number((97.5 + Math.random() * 2).toFixed(1)),
     temperature: Number((36.4 + Math.random() * 0.6).toFixed(1)),

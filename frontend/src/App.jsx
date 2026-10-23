@@ -135,7 +135,7 @@ export default function App() {
       };
 
       await sendSampleMeasurement(sample);
-      showNotification('¡Telemetría simulada enviada y persistida en Supabase con éxito!', 'success');
+      showNotification('¡Telemetría fisiológica registrada y transmitida con éxito!', 'success');
       await loadData(true);
     } catch (err) {
       if (err.status === 503) {
@@ -255,7 +255,7 @@ export default function App() {
       {/* Footer de Misión */}
       <footer className="dashboard-footer">
         <div className="footer-content">
-          <span>ASTRAHEALTH-AI &copy; 2026 — Desafío NASA Space Apps: Monitoreo de la salud para astronautas en misiones espaciales.</span>
+          <span>ASTRAHEALTH-AI &copy; 2026 — Sistema de Monitoreo Biométrico y Soporte Vital para Astronautas.</span>
           <div className="footer-links">
             <span className="footer-tag">FastAPI Backend</span>
             <span className="footer-dot">•</span>

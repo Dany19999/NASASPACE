@@ -13,8 +13,7 @@ app = FastAPI(
     title=PROJECT_NAME,
     version=VERSION,
     description=(
-        "API REST para el monitoreo fisiológico de astronautas en misiones espaciales. "
-        "Desarrollado para el desafío NASA Space Apps 2026."
+        "API REST para el monitoreo biomédico y soporte fisiológico de astronautas en misiones espaciales."
     ),
     docs_url="/docs",
     redoc_url="/redoc",
