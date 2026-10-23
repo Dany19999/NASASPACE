@@ -1112,3 +1112,722 @@ body {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
+
+/* --------------------------------------------------------------------------
+   Live Telemetry Badges & Pulse
+   -------------------------------------------------------------------------- */
+.live-telemetry-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #10b981;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+}
+
+.live-ping-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #10b981;
+  animation: pulse-dot 1.2s infinite ease-in-out;
+}
+
+.metrics-pulse-flash .metric-card {
+  border-color: rgba(0, 242, 254, 0.7);
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
+  transition: all 0.25s ease-out;
+}
+
+/* --------------------------------------------------------------------------
+   Barra de Navegación por Apartados / Secciones
+   -------------------------------------------------------------------------- */
+.dashboard-nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.35rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.nav-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 1.15rem;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+}
+
+.nav-tab-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.nav-tab-btn.active {
+  color: var(--cyan-primary);
+  background: rgba(0, 242, 254, 0.1);
+  border-color: rgba(0, 242, 254, 0.35);
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.15);
+}
+
+.tab-content-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.section-main-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.section-main-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+}
+
+/* --------------------------------------------------------------------------
+   Sección de Problemas y Riesgos Probables
+   -------------------------------------------------------------------------- */
+.risks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 1.25rem;
+}
+
+@media (max-width: 640px) {
+  .risks-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.risk-card {
+  padding: 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border-left-width: 4px;
+}
+
+.risk-card.risk-normal {
+  border-left-color: var(--normal-color);
+}
+
+.risk-card.risk-warning {
+  border-left-color: var(--warning-color);
+}
+
+.risk-card.risk-critical {
+  border-left-color: var(--critical-color);
+}
+
+.risk-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.risk-title-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.risk-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.risk-icon-wrapper.icon-normal {
+  background: var(--normal-bg);
+  color: var(--normal-color);
+  border: 1px solid var(--normal-border);
+}
+
+.risk-icon-wrapper.icon-warning {
+  background: var(--warning-bg);
+  color: var(--warning-color);
+  border: 1px solid var(--warning-border);
+}
+
+.risk-icon-wrapper.icon-critical {
+  background: var(--critical-bg);
+  color: var(--critical-color);
+  border: 1px solid var(--critical-border);
+}
+
+.risk-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.risk-metric-tag {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  color: var(--cyan-primary);
+  margin-top: 0.15rem;
+}
+
+.risk-description {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.risk-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 500px) {
+  .risk-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.risk-detail-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.risk-detail-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.risk-detail-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+}
+
+.risk-detail-list li {
+  position: relative;
+  padding-left: 0.85rem;
+  line-height: 1.35;
+}
+
+.risk-detail-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--cyan-primary);
+}
+
+/* --------------------------------------------------------------------------
+   Sección de Diagnóstico y Protocolos de Solución
+   -------------------------------------------------------------------------- */
+.protocol-alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.9rem 1.25rem;
+  border-radius: var(--radius-md);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: var(--text-primary);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.protocol-alert-content strong {
+  display: block;
+  font-size: 0.9rem;
+  color: #10b981;
+}
+
+.protocol-alert-content p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.diagnosis-hero-card {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.diagnosis-hero-card.diagnosis-normal {
+  border-color: var(--normal-border);
+}
+
+.diagnosis-hero-card.diagnosis-warning {
+  border-color: var(--warning-border);
+}
+
+.diagnosis-hero-card.diagnosis-critical {
+  border-color: var(--critical-border);
+}
+
+.diagnosis-hero-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.diagnosis-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.icon-diagnosis {
+  color: var(--cyan-primary);
+}
+
+.diagnosis-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 0.35rem;
+}
+
+.diagnosis-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--card-border);
+}
+
+@media (max-width: 768px) {
+  .diagnosis-body-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.diagnosis-col .col-label {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.diagnosis-text {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.diagnosis-text.text-highlight {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Stepper de Protocolos */
+.protocols-stepper-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stepper-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.protocol-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.step-card {
+  position: relative;
+  padding: 1.35rem;
+  display: flex;
+  gap: 1rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.step-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--card-hover-border);
+}
+
+.step-card.step-priority-high {
+  border-color: rgba(239, 68, 68, 0.4);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(15, 23, 42, 0.85));
+}
+
+.step-number-badge {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(0, 242, 254, 0.15);
+  border: 1px solid rgba(0, 242, 254, 0.4);
+  color: var(--cyan-primary);
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.step-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.step-urgency {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.04em;
+}
+
+.urgency-high {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.urgency-normal {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.step-desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.step-action-box {
+  margin-top: 0.4rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.78rem;
+}
+
+.step-action-box strong {
+  color: var(--cyan-primary);
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+.step-action-box p {
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+/* Panel de Comandos Rápidos */
+.quick-actions-panel {
+  padding: 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.actions-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.actions-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.actions-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.action-buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.85rem;
+}
+
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.btn-action-o2 {
+  background: rgba(0, 242, 254, 0.12);
+  color: var(--cyan-primary);
+  border-color: rgba(0, 242, 254, 0.35);
+}
+
+.btn-action-o2:hover {
+  background: rgba(0, 242, 254, 0.22);
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.2);
+}
+
+.btn-action-cool {
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.btn-action-cool:hover {
+  background: rgba(56, 189, 248, 0.22);
+}
+
+.btn-action-pause {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.btn-action-pause:hover {
+  background: rgba(239, 68, 68, 0.22);
+}
+
+.btn-action-reset {
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--text-secondary);
+  border-color: rgba(148, 163, 184, 0.25);
+}
+
+.btn-action-reset:hover {
+  color: var(--text-primary);
+  background: rgba(148, 163, 184, 0.18);
+}
+
+/* --------------------------------------------------------------------------
+   Sección de Enlace Wokwi
+   -------------------------------------------------------------------------- */
+.wokwi-status-card {
+  padding: 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.wokwi-status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.wokwi-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.wokwi-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.wokwi-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.wokwi-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--card-border);
+}
+
+.wokwi-meta-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.meta-col-label {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.meta-col-code {
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  color: var(--cyan-primary);
+  word-break: break-all;
+}
+
+.meta-col-val {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.wokwi-steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.wokwi-guide-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.wokwi-guide-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.guide-step-card {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  position: relative;
+}
+
+.guide-step-num {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guide-step-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.guide-step-text {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.sample-action-card {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.sample-text-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.sample-text-group strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.sample-text-group p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+

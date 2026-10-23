@@ -1,7 +1,7 @@
 import React from 'react';
-import { Activity, Droplets, Heart, Radio, Thermometer, UserCheck } from 'lucide-react';
+import { Activity, Droplets, Heart, Radio, Thermometer } from 'lucide-react';
 
-export default function MetricCards({ measurement, aiAnalysis }) {
+export default function MetricCards({ measurement, aiAnalysis, isPulsing = false }) {
   if (!measurement) {
     return (
       <div className="metrics-grid">
@@ -9,14 +9,13 @@ export default function MetricCards({ measurement, aiAnalysis }) {
           <div key={i} className="card metric-card metric-card-loading">
             <div className="skeleton-line skeleton-title" />
             <div className="skeleton-line skeleton-value" />
-            <div className="skeleton-line skeleton-subtitle" />
           </div>
         ))}
       </div>
     );
   }
 
-  const { device_id, heart_rate, spo2, temperature, activity, timestamp } = measurement;
+  const { device_id, heart_rate, spo2, temperature, activity } = measurement;
 
   // Clasificación de métricas
   const getHrStatus = (hr) => {
@@ -32,9 +31,18 @@ export default function MetricCards({ measurement, aiAnalysis }) {
   };
 
   const getTempStatus = (temp) => {
-    if (temp < 35.0 || temp >= 38.5) return { label: 'CRÍTICO', type: 'critical' };
-    if (temp < 36.0 || temp > 37.5) return { label: 'ALERTA', type: 'warning' };
+    if (temp < 35.5 || temp >= 38.0) return { label: 'CRÍTICO', type: 'critical' };
+    if (temp < 36.0 || temp > 37.3) return { label: 'ALERTA', type: 'warning' };
     return { label: 'NORMAL', type: 'normal' };
+  };
+
+  const getActivityLabel = (act) => {
+    if (!act) return 'REPOSO';
+    const lower = act.toLowerCase();
+    if (lower === 'resting') return 'REPOSO';
+    if (lower === 'exercise') return 'EJERCICIO FÍSICO';
+    if (lower === 'eva') return 'MISIÓN EVA (ESPACIAL)';
+    return act.toUpperCase();
   };
 
   const hrStatus = getHrStatus(heart_rate);
@@ -42,7 +50,7 @@ export default function MetricCards({ measurement, aiAnalysis }) {
   const tempStatus = getTempStatus(temperature);
 
   return (
-    <div className="metrics-grid">
+    <div className={`metrics-grid ${isPulsing ? 'metrics-pulse-flash' : ''}`}>
       {/* 1. Frecuencia Cardíaca */}
       <div className={`card metric-card metric-${hrStatus.type}`}>
         <div className="metric-header">
@@ -58,9 +66,6 @@ export default function MetricCards({ measurement, aiAnalysis }) {
           <div className="metric-value-row">
             <span className="metric-number">{Number(heart_rate).toFixed(1)}</span>
             <span className="metric-unit">lpm</span>
-          </div>
-          <div className="metric-range">
-            <span>Rango nominal: 60 - 100 lpm</span>
           </div>
         </div>
       </div>
@@ -106,29 +111,23 @@ export default function MetricCards({ measurement, aiAnalysis }) {
             <span className="metric-number">{Number(temperature).toFixed(1)}</span>
             <span className="metric-unit">°C</span>
           </div>
-          <div className="metric-range">
-            <span>Rango normal: 36.0 - 37.5 °C</span>
-          </div>
         </div>
       </div>
 
-      {/* 4. Actividad & Dispositivo */}
+      {/* 4. Actividad & Enlace IoT */}
       <div className="card metric-card metric-activity">
         <div className="metric-header">
           <div className="metric-icon-box activity-box">
             <Activity size={24} />
           </div>
           <span className="status-pill pill-cyan">
-            <Radio size={12} className="pulse-dot" /> ENLACE ACTIVO
+            <Radio size={12} className="pulse-dot" /> EN VIVO
           </span>
         </div>
         <div className="metric-body">
           <span className="metric-label">Actividad del Astronauta</span>
           <div className="metric-value-row">
-            <span className="metric-activity-text">{activity?.toUpperCase() || 'REPOSO'}</span>
-          </div>
-          <div className="metric-device-info">
-            <span>Dispositivo: <strong>{device_id || 'ESP32'}</strong></span>
+            <span className="metric-activity-text">{getActivityLabel(activity)}</span>
           </div>
         </div>
       </div>

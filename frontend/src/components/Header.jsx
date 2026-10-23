@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, Database, RefreshCw, Send, Shield, Wifi, WifiOff } from 'lucide-react';
+import { Activity, RefreshCw, Send, Wifi, WifiOff } from 'lucide-react';
 
 export default function Header({
   connectionStatus,
@@ -19,42 +19,37 @@ export default function Header({
       {/* Brand y Título */}
       <div className="header-brand">
         <div className="brand-logo-wrapper">
-          <Activity className="brand-icon" size={28} />
+          <Activity className="brand-icon pulsing-heart" size={28} />
           <div className="logo-glow" />
         </div>
         <div>
           <div className="brand-title-row">
             <h1 className="brand-title">ASTRAHEALTH-AI</h1>
-            <span className="brand-badge">MISSION CONTROL</span>
+            <span className="live-telemetry-badge">
+              <span className="live-ping-dot" />
+              <span>EN VIVO</span>
+            </span>
           </div>
           <p className="brand-subtitle">
-            Monitoreo Biométrico y Soporte Fisiológico Aeroespacial
+            Monitoreo Biométrico y Diagnóstico Fisiológico en Tiempo Real
           </p>
         </div>
       </div>
 
       {/* Acciones y Estado del Sistema */}
       <div className="header-actions">
-        {/* Badge de Conexión */}
+        {/* Badge de Conexión en Tiempo Real */}
         <div className="status-group">
           <div className={`connection-pill ${isOnline ? 'pill-online' : 'pill-offline'}`}>
             {isOnline ? <Wifi size={15} /> : <WifiOff size={15} />}
-            <span>{isOnline ? 'SISTEMA ONLINE' : 'DESCONECTADO'}</span>
-            <span className="live-dot" />
+            <span>{isOnline ? 'ENLACE ACTIVO' : 'SIN CONEXIÓN'}</span>
           </div>
-
-          {backendInfo && backendInfo.database && (
-            <div className={`db-pill ${backendInfo.database === 'connected' ? 'db-connected' : 'db-warn'}`}>
-              <Database size={13} />
-              <span>DB: {backendInfo.database === 'connected' ? 'SUPABASE' : backendInfo.database.toUpperCase()}</span>
-            </div>
-          )}
         </div>
 
         {/* Última actualización */}
         {lastUpdated && (
           <div className="last-sync-text">
-            <span>Última sinc: </span>
+            <span>Último dato: </span>
             <strong>{new Date(lastUpdated).toLocaleTimeString()}</strong>
           </div>
         )}
@@ -66,10 +61,10 @@ export default function Header({
             type="button"
             className={`btn-toggle ${autoRefresh ? 'active' : ''}`}
             onClick={() => setAutoRefresh(!autoRefresh)}
-            title="Activar o desactivar sincronización automática en vivo"
+            title="Sincronización automática de telemetría en tiempo real"
           >
             <span className="toggle-indicator" />
-            <span>Auto (3s)</span>
+            <span>Tiempo Real (2.5s)</span>
           </button>
 
           {/* Botón Refrescar */}
@@ -80,7 +75,7 @@ export default function Header({
             disabled={isRefreshing}
             title="Recargar datos ahora"
           >
-            <RefreshCw size={16} className={isRefreshing ? 'spin' : ''} />
+            <RefreshCw size={15} className={isRefreshing ? 'spin' : ''} />
             <span>Sincronizar</span>
           </button>
 
@@ -92,8 +87,8 @@ export default function Header({
             disabled={isSendingSample || !isOnline}
             title="Registrar y transmitir una lectura de telemetría médica al sistema"
           >
-            <Send size={16} className={isSendingSample ? 'spin' : ''} />
-            <span>Transmitir Telemetría</span>
+            <Send size={15} className={isSendingSample ? 'spin' : ''} />
+            <span>Transmitir Paquete</span>
           </button>
         </div>
       </div>
