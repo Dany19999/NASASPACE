@@ -1,0 +1,4 @@
+[wokwi]
+version = 1
+firmware = "iot/firmware.bin"
+diagram = "iot/diagram.json"

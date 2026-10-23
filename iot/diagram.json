@@ -1,36 +1,59 @@
 {
   "version": 1,
-  "author": "ASTRAHEALTH-AI Team",
+  "author": "Desarrollador",
   "editor": "wokwi",
   "parts": [
     {
-      "type": "board-esp32-devkit-c-v4",
+      "type": "board-esp32-devkit-v1",
       "id": "esp",
       "top": 0,
       "left": 0,
       "attrs": {}
     },
     {
-      "type": "wokwi-led",
-      "id": "led-status",
-      "top": -60,
-      "left": 40,
-      "attrs": { "color": "cyan", "label": "TRANSMIT" }
-    },
-    {
-      "type": "wokwi-resistor",
-      "id": "r1",
-      "top": -30,
-      "left": 40,
-      "attrs": { "value": "220" }
+      "type": "wokwi-potentiometer",
+      "id": "pot1",
+      "top": -40,
+      "left": 140,
+      "attrs": {}
     }
   ],
   "connections": [
-    [ "esp:TX", "$serialMonitor:RX", "", [] ],
-    [ "esp:RX", "$serialMonitor:TX", "", [] ],
-    [ "esp:GND.1", "led-status:C", "black", [ "v0" ] ],
-    [ "esp:2", "r1:1", "cyan", [ "v0" ] ],
-    [ "r1:2", "led-status:A", "cyan", [ "v0" ] ]
-  ],
-  "dependencies": {}
+    [
+      "esp:TX",
+      "$serialMonitor",
+      "RX",
+      ""
+    ],
+    [
+      "esp:RX",
+      "$serialMonitor",
+      "TX",
+      ""
+    ],
+    [
+      "pot1:GND",
+      "esp:GND.1",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "pot1:VCC",
+      "esp:3V3",
+      "red",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "pot1:SIG",
+      "esp:34",
+      "green",
+      [
+        "v0"
+      ]
+    ]
+  ]
 }

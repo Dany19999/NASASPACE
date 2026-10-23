@@ -1,137 +1,151 @@
-/**
- * ============================================================================
- * ASTRAHEALTH-AI — Firmware ESP32 Simulado (Wokwi)
- * Desafío NASA Space Apps 2026: Monitoreo de salud en misiones espaciales
- * ============================================================================
- * Genera telemetría biométrica sintética y la transmite al backend FastAPI.
+/*
+ * ======================================================================================
+ * PROYECTO: ASTRAHEALTH-AI — SIMULADOR IOT DE TELEMETRIA FISIOLOGICA
+ * Microcontrolador: ESP32 DevKit (Wokwi Simulation)
+ * ======================================================================================
+ * Requerimientos implementados:
+ * 1. Circuito virtual con ESP32 y potenciómetro en Wokwi.
+ * 2. Generación de datos fisiológicos simulados: Frecuencia cardíaca, SpO₂ y Temperatura.
+ * 3. Uso de potenciómetro (GPIO 34) para modificar los valores simulados en tiempo real.
+ * 4. Mapeo continuo con resolución decimal realista.
+ * 5. Visualización de datos en el Monitor Serial en formato JSON.
+ * 6. Preparación y envío de datos mediante HTTP POST al backend FastAPI.
+ * ======================================================================================
  */
 
 #include <WiFi.h>
 #include <HTTPClient.h>
-#include <ArduinoJson.h>
 
-// Credenciales de red para simulación en Wokwi
+// Pin analógico conectado al pin SIG del potenciómetro (ADC1 - GPIO 34)
+const int potPin = 34;
+
+// Credenciales WiFi de la red virtual de Wokwi
 const char* ssid = "Wokwi-GUEST";
 const char* password = "";
 
-// URL del backend (reemplazar con la URL en Render o localhost con túnel Wokwi)
-// Para simulación local con túnel Wokwi o Render:
-const char* serverUrl = "http://host.wokwi.internal:8000/api/v1/measurements";
+// URL del backend FastAPI (endpoints compatibles: /api/v1/measurements y /api/telemetria)
+// 1. Para backend desplegado en Render:
+const char* serverUrl = "https://nasaspace-main.onrender.com/api/v1/measurements";
 
-// Identificador del kit de telemetría del astronauta
-const char* deviceId = "ASTRA-ESP32-01";
-
-// Intervalo de transmisión en milisegundos (ej. cada 5 segundos)
-const unsigned long transmitInterval = 5000;
-unsigned long lastTransmitTime = 0;
+// 2. Para pruebas locales con Wokwi IoT Gateway (descomentar si ejecutas uvicorn localmente):
+// const char* serverUrl = "http://host.wokwi.internal:8000/api/v1/measurements";
 
 void setup() {
   Serial.begin(115200);
   delay(1000);
 
-  Serial.println("\n========================================");
-  Serial.println("  ASTRAHEALTH-AI — ESP32 Telemetry Kit  ");
-  Serial.println("  NASA Space Apps Challenge 2026        ");
-  Serial.println("========================================");
+  Serial.println("\n=======================================================");
+  Serial.println("  ASTRAHEALTH-AI — ESP32 Telemetria Fisiologica (IoT)  ");
+  Serial.println("=======================================================");
 
-  // Conectar a la red WiFi simulada de Wokwi
-  Serial.print("Conectando a WiFi: ");
+  // Configurar pin analógico como entrada
+  pinMode(potPin, INPUT);
+
+  // Intentar conectar a la red WiFi virtual de Wokwi
+  Serial.print("Conectando a la red WiFi: ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
 
-  int retries = 0;
-  while (WiFi.status() != WL_CONNECTED && retries < 20) {
+  int intentos = 0;
+  while (WiFi.status() != WL_CONNECTED && intentos < 20) {
     delay(500);
     Serial.print(".");
-    retries++;
+    intentos++;
   }
 
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("\n[WiFi] Conectado exitosamente.");
-    Serial.print("[WiFi] Dirección IP: ");
+    Serial.print("[WiFi] IP asignada: ");
     Serial.println(WiFi.localIP());
   } else {
-    Serial.println("\n[WiFi] Advertencia: Modo offline. Reintentando en bucle...");
-  }
-}
-
-/**
- * Genera valores biométricos sintéticos realistas con variaciones graduales
- */
-void generateTelemetry(float &hr, float &spo2, float &temp, String &activity) {
-  // Simular ciclo circadiano y variaciones leves
-  float noiseHr = (random(-30, 31) / 10.0);
-  float noiseSpo2 = (random(-10, 11) / 20.0);
-  float noiseTemp = (random(-15, 16) / 100.0);
-
-  // Ocasionalmente simular actividad física
-  int mode = random(0, 10);
-  if (mode < 7) {
-    activity = "resting";
-    hr = 70.0 + noiseHr;
-    spo2 = 98.2 + noiseSpo2;
-    temp = 36.6 + noiseTemp;
-  } else if (mode < 9) {
-    activity = "exercise";
-    hr = 118.0 + noiseHr;
-    spo2 = 96.5 + noiseSpo2;
-    temp = 37.2 + noiseTemp;
-  } else {
-    activity = "eva"; // Actividad Extravehicular
-    hr = 92.0 + noiseHr;
-    spo2 = 97.8 + noiseSpo2;
-    temp = 36.8 + noiseTemp;
+    Serial.println("\n[WiFi] Aviso: WiFi no conectado aun (los datos se emitiran por Serial).");
   }
 
-  // Límites fisiológicos seguros
-  if (spo2 > 100.0) spo2 = 100.0;
-  if (spo2 < 85.0)  spo2 = 85.0;
+  Serial.println("=======================================================\n");
 }
 
 void loop() {
-  unsigned long currentMillis = millis();
+  // 1. Lectura del potenciómetro (ADC de 12 bits: 0 a 4095)
+  int potValue = analogRead(potPin);
+  float factor = (float)potValue / 4095.0;
 
-  if (currentMillis - lastTransmitTime >= transmitInterval) {
-    lastTransmitTime = currentMillis;
+  // 2. Mapeo dinámico y continuo a valores fisiológicos realistas
+  // Frecuencia cardíaca: 60.0 a 140.0 lpm (lpm / bpm)
+  float heartRate = 60.0 + (factor * (140.0 - 60.0));
 
-    float hr, spo2, temp;
-    String activity;
-    generateTelemetry(hr, spo2, temp, activity);
+  // Saturación de oxígeno en sangre (SpO₂): 90.0% a 100.0%
+  float spo2 = 90.0 + (factor * (100.0 - 90.0));
 
-    Serial.println("\n----------------------------------------");
-    Serial.printf("[Sensor] HR: %.1f bpm | SpO2: %.1f%% | Temp: %.2f °C | Estado: %s\n", 
-                  hr, spo2, temp, activity.c_str());
+  // Temperatura corporal: 36.0°C a 39.5°C
+  float temperature = 36.0 + (factor * (39.5 - 36.0));
 
-    if (WiFi.status() == WL_CONNECTED) {
-      HTTPClient http;
-      http.begin(serverUrl);
-      http.addHeader("Content-Type", "application/json");
-
-      // Construir JSON con ArduinoJson
-      StaticJsonDocument<256> doc;
-      doc["device_id"] = deviceId;
-      doc["heart_rate"] = hr;
-      doc["spo2"] = spo2;
-      doc["temperature"] = temp;
-      doc["activity"] = activity;
-
-      String requestBody;
-      serializeJson(doc, requestBody);
-
-      Serial.println("[HTTP] Transmitiendo telemetría al backend...");
-      int httpResponseCode = http.POST(requestBody);
-
-      if (httpResponseCode > 0) {
-        String response = http.getString();
-        Serial.printf("[HTTP] Código de respuesta: %d\n", httpResponseCode);
-        Serial.println("[HTTP] Respuesta del servidor: " + response);
-      } else {
-        Serial.printf("[HTTP] Error en transmisión: %s\n", http.errorToString(httpResponseCode).c_str());
-      }
-
-      http.end();
-    } else {
-      Serial.println("[WiFi] No hay conexión de red. Telemetría almacenada en búfer local.");
-    }
+  // 3. Estimación del nivel de actividad según el esfuerzo fisiológico
+  String activity = "resting";
+  if (heartRate >= 120.0) {
+    activity = "eva";          // Actividad Extravehicular (alta demanda)
+  } else if (heartRate >= 90.0) {
+    activity = "exercise";     // Ejercicio cardiovascular
+  } else {
+    activity = "resting";      // Reposo basal
   }
+
+  // 4. Construcción del payload JSON estructurado
+  // Incluye nombres en español e inglés para compatibilidad total con cualquier consumidor
+  String jsonPayload = "{";
+  jsonPayload += "\"device_id\":\"ASTRA-ESP32-01\",";
+  jsonPayload += "\"frecuencia_cardiaca\":" + String(heartRate, 1) + ",";
+  jsonPayload += "\"heart_rate\":" + String(heartRate, 1) + ",";
+  jsonPayload += "\"spo2\":" + String(spo2, 1) + ",";
+  jsonPayload += "\"temperatura\":" + String(temperature, 1) + ",";
+  jsonPayload += "\"temperature\":" + String(temperature, 1) + ",";
+  jsonPayload += "\"activity\":\"" + activity + "\",";
+  jsonPayload += "\"potenciometro\":" + String(potValue);
+  jsonPayload += "}";
+
+  // 5. Mostrar en el Monitor Serial en formato JSON
+  Serial.println("---------------- [LECTURA DE TELEMETRIA] ----------------");
+  Serial.print("Potenciometro: ");
+  Serial.print(potValue);
+  Serial.print(" / 4095 | FC: ");
+  Serial.print(heartRate, 1);
+  Serial.print(" bpm | SpO2: ");
+  Serial.print(spo2, 1);
+  Serial.print("% | Temp: ");
+  Serial.print(temperature, 1);
+  Serial.print(" C | Estado: ");
+  Serial.println(activity);
+  Serial.println("JSON emitido:");
+  Serial.println(jsonPayload);
+
+  // 6. Enviar datos mediante HTTP POST al backend FastAPI
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    http.begin(serverUrl);
+    http.addHeader("Content-Type", "application/json");
+
+    Serial.print("Enviando HTTP POST a: ");
+    Serial.println(serverUrl);
+
+    int httpCode = http.POST(jsonPayload);
+
+    if (httpCode > 0) {
+      Serial.print("-> Codigo de respuesta HTTP: ");
+      Serial.println(httpCode);
+      String response = http.getString();
+      Serial.print("-> Respuesta del servidor: ");
+      Serial.println(response);
+    } else {
+      Serial.print("-> Error en HTTP POST: ");
+      Serial.println(http.errorToString(httpCode).c_str());
+    }
+
+    http.end();
+  } else {
+    Serial.println("[Aviso] WiFi no conectado. Transmision HTTP omitida en esta muestra.");
+  }
+
+  Serial.println("---------------------------------------------------------\n");
+
+  // Frecuencia de muestreo: cada 2 segundos
+  delay(2000);
 }
